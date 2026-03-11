@@ -8,7 +8,7 @@
         /* --- DESIGN SYSTEM & BASE --- */
         :root {
             --bg-color: #000000; --text-primary: #f5f5f7; --text-secondary: #86868b;
-            --accent-blue: #0A84FF; --glass-bg: rgba(28, 28, 30, 0.6);
+            --accent-blue: #0A84FF; --glass-bg: rgba(28, 28, 30, 0.7);
             --glass-border: rgba(255, 255, 255, 0.1); --card-bg: #1c1c1e;
             --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
         }
@@ -21,6 +21,7 @@
             -webkit-font-smoothing: antialiased; 
             display: flex; 
             overflow-x: hidden;
+            min-height: 100vh;
         }
         
         a { text-decoration: none; color: inherit; cursor: pointer; }
@@ -33,7 +34,7 @@
         .cta-btn.primary:hover { transform: scale(1.02); background-color: #0071e3; }
         .cta-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        /* --- SIDEBAR LAYOUT --- */
+        /* --- SIDEBAR LAYOUT (DESKTOP) --- */
         #sidebar {
             width: 260px; height: 100vh; background: var(--card-bg);
             border-right: 1px solid var(--glass-border); position: fixed;
@@ -58,18 +59,11 @@
         }
         .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
         .nav-item.active { background: rgba(10, 132, 255, 0.15); color: var(--accent-blue); }
-        .nav-item svg { width: 20px; height: 20px; }
+        .nav-item svg { width: 20px; height: 20px; pointer-events: none;}
         .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 0.5rem;}
 
-        @media (max-width: 900px) {
-            #sidebar { width: 70px; padding: 1.5rem 0.5rem; align-items: center; }
-            .nav-item span, .sidebar-logo span:last-child { display: none; }
-            .sidebar-logo { font-size: 1.5rem; margin-bottom: 2rem; padding-left: 0; }
-            .main-content { margin-left: 70px; width: calc(100% - 70px); padding: 1.5rem; }
-            .nav-item { justify-content: center; padding: 1rem; }
-            .sidebar-footer .cta-btn { padding: 0.8rem 0; font-size: 0; }
-            .sidebar-footer .cta-btn::after { content: '★'; font-size: 1.2rem; }
-        }
+        /* --- MOBILE BOTTOM NAV --- */
+        #mobile-nav { display: none; }
 
         /* --- VIEWS --- */
         .section-container { max-width: 1200px; margin: 0 auto; }
@@ -78,7 +72,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- LIBRARY SEARCH & CONTROLS --- */
-        .library-controls { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3rem; align-items: center; }
+        .library-controls { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem; align-items: center; }
         .search-bar { display: flex; align-items: center; background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 30px; padding: 0.8rem 1.5rem; width: 100%; max-width: 600px; transition: border-color 0.3s; }
         .search-bar:focus-within { border-color: var(--accent-blue); }
         .search-bar svg.icon { color: var(--text-secondary); margin-right: 1rem; }
@@ -87,17 +81,27 @@
         .mic-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0.5rem; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease, transform 0.2s ease; margin-left: 0.5rem; }
         .mic-btn:hover { color: var(--accent-blue); transform: scale(1.1); }
 
-        .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-        .filter-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-secondary); padding: 0.5rem 1.2rem; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
-        .filter-btn:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+        .filters, .advanced-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; width: 100%; }
+        .advanced-filters { margin-top: -0.5rem; padding-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.05); }
+        
+        .filter-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-secondary); padding: 0.5rem 1.2rem; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+        .filter-btn:hover:not(.locked) { color: var(--text-primary); border-color: var(--text-secondary); }
         .filter-btn.active { background: var(--text-primary); color: var(--bg-color); border-color: var(--text-primary); }
+        
+        .filter-btn.locked { background: rgba(255,255,255,0.02); color: rgba(134, 134, 139, 0.5); cursor: pointer; border-style: dashed; }
+        .filter-btn.locked svg { opacity: 0.5; }
+        .filter-btn.locked:hover { background: rgba(10, 132, 255, 0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
+        .filter-btn.locked:hover svg { opacity: 1; }
+
+        @keyframes lockWiggle { 0% {transform: rotate(0deg);} 25% {transform: rotate(-10deg);} 50% {transform: rotate(10deg);} 75% {transform: rotate(-10deg);} 100% {transform: rotate(0deg);} }
+        .wiggle { animation: lockWiggle 0.4s ease; }
 
         /* --- CARDS & LISTS --- */
         .sound-list { display: flex; flex-direction: column; gap: 1rem; }
         .sound-card { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); border: 1px solid var(--glass-border); padding: 1rem 1.5rem; border-radius: 16px; transition: transform 0.2s, background 0.2s; }
         .sound-card:hover { transform: scale(1.01); background: rgba(44,44,46,0.8); }
         .sound-info { display: flex; align-items: center; gap: 1.5rem; }
-        .play-trigger { background: var(--accent-blue); border: none; border-radius: 50%; width: 40px; height: 40px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+        .play-trigger { background: var(--accent-blue); border: none; border-radius: 50%; width: 40px; height: 40px; min-width: 40px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
         .play-trigger:hover { transform: scale(1.1); }
         .sound-details h4 { font-size: 1.1rem; margin-bottom: 0.2rem; }
         .sound-tags { font-size: 0.8rem; color: var(--text-secondary); }
@@ -110,49 +114,85 @@
         .profile-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border); }
         .avatar-large { width: 64px; height: 64px; background: var(--accent-blue); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 600; }
 
-        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
-
-        /* --- GLOBAL AUDIO PLAYER --- */
-        #global-player { position: fixed; bottom: 20px; left: calc(50% + 130px); transform: translateX(-50%); width: 90%; max-width: 800px; background: var(--glass-bg); backdrop-filter: blur(30px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 1rem 2rem; z-index: 2000; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: opacity 0.4s ease; }
-        #global-player.player-hidden { opacity: 0; pointer-events: none; }
-        .player-container { display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
-        .track-info { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .player-controls { display: flex; align-items: center; gap: 1rem; }
-        .control-btn { background: none; border: none; color: var(--text-primary); cursor: pointer; transition: opacity 0.2s; }
-        .control-btn:hover { opacity: 0.8; }
-        .play-btn { background: var(--text-primary); color: var(--bg-color); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;}
-        .play-btn:hover { transform: scale(1.05); }
-        .progress-container { flex: 2; display: flex; align-items: center; gap: 1rem; font-size: 0.8rem; color: var(--text-secondary); }
-        .progress-bar-wrapper { flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; cursor: pointer; position: relative; overflow: hidden; }
+        /* --- ADVANCED GLOBAL AUDIO PLAYER --- */
+        #global-player { position: fixed; bottom: 20px; left: calc(50% + 130px); transform: translateX(-50%); width: 90%; max-width: 900px; background: var(--glass-bg); backdrop-filter: blur(30px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 1rem 2rem; z-index: 2000; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: opacity 0.4s ease, transform 0.4s ease; }
+        #global-player.player-hidden { opacity: 0; pointer-events: none; transform: translate(-50%, 20px); }
+        .player-container { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+        
+        .track-info { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 150px; }
+        
+        .player-controls { display: flex; align-items: center; gap: 0.8rem; justify-content: center; }
+        .control-btn { background: none; border: none; color: var(--text-primary); cursor: pointer; transition: opacity 0.2s, color 0.2s; display: flex; align-items: center; justify-content: center; padding: 0.4rem;}
+        .control-btn:hover { opacity: 0.8; color: var(--accent-blue); }
+        .control-btn.active { color: var(--accent-blue); }
+        .play-btn { background: var(--text-primary); color: var(--bg-color); border-radius: 50%; width: 44px; height: 44px; transition: transform 0.2s;}
+        .play-btn:hover { transform: scale(1.05); color: var(--bg-color); opacity: 1;}
+        
+        .progress-container { flex: 2; display: flex; align-items: center; gap: 1rem; font-size: 0.8rem; color: var(--text-secondary); min-width: 200px; }
+        .progress-bar-wrapper { flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; cursor: pointer; position: relative; overflow: hidden; transition: height 0.2s; }
+        .progress-bar-wrapper:hover { height: 8px; }
         .progress-bar { height: 100%; width: 0%; background: var(--accent-blue); border-radius: 3px; pointer-events: none; transition: width 0.1s linear; }
 
+        .volume-container { display: flex; align-items: center; gap: 0.5rem; flex: 0.5; min-width: 100px; justify-content: flex-end;}
+        .volume-slider { width: 80px; height: 4px; -webkit-appearance: none; background: rgba(255,255,255,0.2); border-radius: 2px; outline: none; cursor: pointer;}
+        .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--text-primary); cursor: pointer; }
+
+        /* --- MOBILE RESPONSIVENESS (FULL SUPPORT) --- */
         @media (max-width: 900px) {
-            #global-player { left: 50%; transform: translateX(-50%); width: calc(100% - 100px); margin-left: 35px; padding: 1rem; }
-            .player-container { flex-direction: column; gap: 1rem; }
-            .progress-container { width: 100%; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            /* Hide desktop sidebar */
+            #sidebar { display: none; }
+            
+            /* Expand main content to full width, add padding for bottom nav */
+            .main-content { margin-left: 0; width: 100%; padding: 1.5rem 1rem; padding-bottom: 180px; }
+            
+            /* Show Mobile Bottom Nav */
+            #mobile-nav {
+                display: flex; position: fixed; bottom: 0; left: 0; width: 100%;
+                background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(20px);
+                border-top: 1px solid var(--glass-border); z-index: 3000;
+                justify-content: space-around; padding: 0.5rem 1rem;
+                padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
+            }
+            .mobile-nav-item {
+                display: flex; flex-direction: column; align-items: center; gap: 4px;
+                color: var(--text-secondary); font-size: 0.7rem; font-weight: 500;
+                background: none; border: none; cursor: pointer; transition: color 0.2s;
+            }
+            .mobile-nav-item.active { color: var(--accent-blue); }
+            .mobile-nav-item svg { width: 22px; height: 22px; }
+
+            /* Adjust Player for Mobile */
+            #global-player { 
+                bottom: calc(70px + env(safe-area-inset-bottom)); /* Sit right above bottom nav */
+                width: calc(100% - 20px); left: 50%; transform: translateX(-50%); 
+                padding: 1rem; border-radius: 20px;
+            }
+            #global-player.player-hidden { transform: translate(-50%, 20px); }
+            
+            .player-container { flex-wrap: wrap; gap: 1rem; }
+            .track-info { width: 100%; flex: none; text-align: center; margin-bottom: 0.5rem; }
+            .volume-container { display: none; } /* Hide volume slider on mobile */
+            .progress-container { width: 100%; flex: none; order: 3; }
+            .player-controls { width: 100%; justify-content: center; flex: none; order: 2; margin-top: -10px;}
+            
+            /* Card & Header adjustments */
+            h2 { font-size: 2rem !important; }
+            .sound-card { flex-direction: column; align-items: flex-start; gap: 1rem; padding: 1.2rem; }
+            .sound-info { width: 100%; }
+            .sound-actions { width: 100%; justify-content: flex-end; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem;}
+            .search-bar { width: 100%; }
+            .advanced-filters { padding-top: 0.5rem; }
         }
 
         /* --- MODALS & PRICING --- */
         .modal-hidden { opacity: 0 !important; visibility: hidden !important; pointer-events: none; }
-        
-        /* Updated Mobile-Friendly Modal Wrapper */
-        .modal { 
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            background: rgba(0,0,0,0.8); z-index: 4000; display: flex; 
-            align-items: flex-start; /* Fixes top cut-off issue on scrollable modals */
-            justify-content: center; transition: all 0.4s ease; 
-            padding: 2rem; overflow-y: auto; 
-        }
-        
-        .glass-panel { 
-            background: var(--glass-bg); backdrop-filter: blur(40px); border: 1px solid var(--glass-border); 
-            border-radius: 32px; padding: 3rem; text-align: center; position: relative; 
-            width: 100%; max-width: 450px; 
-            margin: auto; /* Vertically centers when short, allows scroll when tall */
-        }
-        
+        .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 4000; display: flex; align-items: flex-start; justify-content: center; transition: all 0.4s ease; padding: 2rem; overflow-y: auto;}
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(40px); border: 1px solid var(--glass-border); border-radius: 32px; padding: 3rem; text-align: center; position: relative; width: 100%; max-width: 450px; margin: auto; }
         .glass-panel.wide { max-width: 1200px; padding: 3rem 2.5rem; }
-        
         .close-btn { position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(255,255,255,0.1); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; transition: transform 0.2s, background 0.2s; z-index: 10; }
         .close-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
         .input-group { margin-bottom: 1.2rem; text-align: left; }
@@ -165,9 +205,17 @@
         .project-select-btn.disabled { opacity: 0.5; cursor: not-allowed; }
         .add-text { color: var(--accent-blue); font-size: 0.85rem; font-weight: 500; }
 
-        /* Pricing Grid Layout */
         .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 2.5rem; align-items: stretch; }
-        
+        @media (max-width: 1050px) { .pricing-grid { grid-template-columns: repeat(2, 1fr); } .pricing-card.popular { transform: none; } }
+        @media (max-width: 650px) {
+            .modal { padding: 1rem; } 
+            .glass-panel.wide { padding: 3.5rem 1rem 1.5rem 1rem; } 
+            .glass-panel.wide h3 { font-size: 1.8rem !important; } 
+            .pricing-grid { grid-template-columns: 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+            .pricing-card { padding: 1.5rem; }
+            .pricing-card.popular { transform: none; }
+        }
+
         .pricing-card { background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 2rem 1.5rem; border-radius: 20px; display: flex; flex-direction: column; text-align: left; position: relative; }
         .pricing-card.popular { border-color: var(--accent-blue); background: rgba(10, 132, 255, 0.05); transform: scale(1.02); z-index: 1; box-shadow: 0 10px 30px rgba(10, 132, 255, 0.1); }
         .pricing-card.limited { border-color: #ff9f0a; background: rgba(255, 159, 10, 0.05); }
@@ -181,21 +229,6 @@
         .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 12px; white-space: nowrap; }
         .pricing-card.popular .badge { background: var(--accent-blue); color: #fff; }
         .pricing-card.limited .badge { background: #ff9f0a; color: #000; }
-
-        /* --- MOBILE RESPONSIVENESS FOR PRICING --- */
-        @media (max-width: 1050px) {
-            .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-            .pricing-card.popular { transform: none; } /* Disable scale pop out on tablets */
-        }
-        
-        @media (max-width: 650px) {
-            .modal { padding: 1rem; } /* Tighten outer modal padding */
-            .glass-panel.wide { padding: 3.5rem 1rem 1.5rem 1rem; } /* Less padding, room for close btn */
-            .glass-panel.wide h3 { font-size: 1.8rem !important; } /* Shrink main title */
-            .pricing-grid { grid-template-columns: 1fr; gap: 1.5rem; margin-top: 1.5rem; }
-            .pricing-card { padding: 1.5rem; }
-            .pricing-card.popular { transform: none; }
-        }
     </style>
 </head>
 <body>
@@ -204,29 +237,40 @@
         <div class="sidebar-logo">
             <a href="#">UNSTUNTED<span>SFX</span></a>
         </div>
-
         <nav class="sidebar-nav">
             <button class="nav-item active" id="nav-library" onclick="switchTab('library')">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                 <span>Library</span>
             </button>
-
             <button class="nav-item" id="nav-projects" onclick="switchTab('projects')">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
                 <span>Projects</span>
             </button>
-
             <button class="nav-item" id="nav-dashboard" onclick="switchTab('dashboard')">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 <span>Account</span>
             </button>
         </nav>
-
         <div class="sidebar-footer">
-            <button class="cta-btn secondary" id="login-btn" style="width: 100%;">Log In with Google</button>
-            <button class="cta-btn primary" id="upgrade-btn" style="width: 100%;" onclick="document.getElementById('pro-modal').classList.remove('modal-hidden')">Upgrade to Pro</button>
+            <button class="cta-btn secondary auth-btn" style="width: 100%;">Log In</button>
+            <button class="cta-btn primary upgrade-btn" style="width: 100%;">Upgrade to Pro</button>
         </div>
     </aside>
+
+    <nav id="mobile-nav">
+        <button class="mobile-nav-item active" id="mob-nav-library" onclick="switchTab('library')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+            Library
+        </button>
+        <button class="mobile-nav-item" id="mob-nav-projects" onclick="switchTab('projects')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+            Projects
+        </button>
+        <button class="mobile-nav-item" id="mob-nav-dashboard" onclick="switchTab('dashboard')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            Account
+        </button>
+    </nav>
 
     <main class="main-content">
         
@@ -242,12 +286,15 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                     </button>
                 </div>
+                
                 <div class="filters">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="sfx">Sound Effects</button>
-                    <button class="filter-btn" data-filter="music">Music</button>
-                    <button class="filter-btn" data-filter="cinematic">Cinematic</button>
+                    <button class="filter-btn active base-filter" data-filter="all">All</button>
+                    <button class="filter-btn base-filter" data-filter="sfx">Sound Effects</button>
+                    <button class="filter-btn base-filter" data-filter="music">Music</button>
                 </div>
+                
+                <div class="advanced-filters" id="advanced-filters-container">
+                    </div>
             </div>
 
             <div id="sound-list" class="sound-list"></div>
@@ -284,9 +331,14 @@
                             <p id="dash-email" style="color: var(--text-secondary); font-size: 0.9rem;">Sign in to save history</p>
                         </div>
                     </div>
-                    <div style="margin-top: 1rem;">
+                    <div>
                         <p style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary);">Plan Status</p>
                         <h4 id="dash-plan" style="font-size: 1.2rem; margin-top: 0.3rem;">Free Tier</h4>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
+                        <button class="cta-btn secondary auth-btn" style="flex: 1; min-width: 120px;">Log In</button>
+                        <button class="cta-btn primary upgrade-btn" style="flex: 1; min-width: 120px;">Upgrade</button>
                     </div>
                 </div>
 
@@ -303,15 +355,27 @@
 
     <div id="global-player" class="player-hidden">
         <div class="player-container">
+            
             <div class="track-info">
                 <div class="track-title" id="player-title" style="font-weight: 600;">Select a track</div>
                 <div class="track-tags" id="player-tags" style="font-size: 0.8rem; color: var(--text-secondary);">--</div>
             </div>
             
             <div class="player-controls">
+                <button class="control-btn" id="loop-btn" title="Loop Toggle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="14" x2="9" y2="14"></line><path d="M21 3v9a2 2 0 0 1-2 2H9"></path><path d="M3 21v-9a2 2 0 0 1 2-2h10"></path><polyline points="3 16 3 21 8 21"></polyline></svg>
+                </button>
+                <button class="control-btn" id="rewind-btn" title="Back 5s">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 19 2 12 11 5 11 19"></polygon><polygon points="22 19 13 12 22 5 22 19"></polygon></svg>
+                </button>
+                
                 <button class="control-btn play-btn" id="play-pause-btn">
-                    <svg id="play-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                    <svg id="pause-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    <svg id="play-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pause-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+
+                <button class="control-btn" id="forward-btn" title="Forward 5s">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 19 22 12 13 5 13 19"></polygon><polygon points="2 19 11 12 2 5 2 19"></polygon></svg>
                 </button>
             </div>
 
@@ -322,6 +386,15 @@
                 </div>
                 <span id="total-time">0:00</span>
             </div>
+
+            <div class="volume-container">
+                <button class="control-btn" id="mute-btn" title="Mute Toggle">
+                    <svg id="vol-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    <svg id="mute-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                </button>
+                <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value="1">
+            </div>
+
         </div>
         <audio id="audio-element"></audio>
     </div>
@@ -366,7 +439,6 @@
             <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Select the plan that fits your editing style. Secure checkout via Stripe.</p>
             
             <div class="pricing-grid">
-                
                 <div class="pricing-card">
                     <h4>Free Tier</h4>
                     <div class="price">$0</div>
@@ -417,7 +489,6 @@
                     </ul>
                     <button class="cta-btn primary" onclick="checkout('lifetime')" style="background-color: #ff9f0a; color: #000;">Claim Lifetime</button>
                 </div>
-
             </div>
         </div>
     </div>
@@ -428,7 +499,7 @@
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // ==========================================
-        // 1. ADD YOUR CONFIGURATION HERE
+        // 1. CONFIGURATION
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAjemYDX-2--f1DZMlnkiyEDTkG5rsyRPw",
@@ -440,13 +511,12 @@
             measurementId: "G-PJTBJ12BM1"
         };
         
-        // ADD YOUR STRIPE PAYMENT LINKS HERE
         const STRIPE_LINK_CREATOR = "https://buy.stripe.com/test_YOUR_CREATOR_LINK_HERE"; 
         const STRIPE_LINK_PRO = "https://buy.stripe.com/test_YOUR_PRO_LINK_HERE"; 
         const STRIPE_LINK_LIFETIME = "https://buy.stripe.com/test_YOUR_LIFETIME_LINK_HERE"; 
 
         // ==========================================
-        // 2. INITIALIZATION & STATE
+        // 2. STATE & DB
         // ==========================================
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -457,40 +527,46 @@
         let userData = { plan: 'free', downloadsToday: 0, lastDownloadDate: '', history: [] };
         let userProjects = JSON.parse(localStorage.getItem('unstuntedsfx_projects')) || [];
         
-        let soundsDB = [
+        const soundsDB = [
             { id: 1, title: "Cinematic Bugle Trailer", category: "cinematic", tags: "Brass, Epic", duration: "0:06", previewURL: "https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg" },
             { id: 2, title: "Coffee Shop Ambience", category: "sfx", tags: "Crowd, Cafe", duration: "0:56", previewURL: "https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg" },
-            { id: 3, title: "Cartoon Ascend", category: "music", tags: "App, Success", duration: "0:03", previewURL: "https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" },
-            { id: 4, title: "Heavy Rain & Thunder", category: "sfx", tags: "Weather, Storm", duration: "0:35", previewURL: "https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg" },
-            { id: 5, title: "Digital Alarm Beep", category: "sfx", tags: "Alert, Tech", duration: "0:04", previewURL: "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" }
+            { id: 3, title: "Cartoon Ascend", category: "music", tags: "App, Meme", duration: "0:03", previewURL: "https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" },
+            { id: 4, title: "Heavy Rain & Thunder", category: "sfx", tags: "Weather, Cinematic", duration: "0:35", previewURL: "https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg" },
+            { id: 5, title: "Digital Alarm Beep", category: "sfx", tags: "Alert, Tech", duration: "0:04", previewURL: "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" },
+            { id: 6, title: "Sword Impact", category: "sfx", tags: "Impact, Gaming", duration: "0:02", previewURL: "https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" } // Mock URL
         ];
 
-        let currentFilter = 'all';
+        // Advanced filter tags available to Pro/Lifetime users
+        const advancedTags = ['Cinematic', 'Meme', 'Gaming', 'Whoosh', 'Impact'];
+
+        let currentFilter = 'all'; // Covers both base categories and advanced tags
         let searchQuery = '';
         let currentSoundToAdd = null;
 
         // ==========================================
-        // 3. AUTHENTICATION & DATABASE SYNC
+        // 3. AUTH & INIT
         // ==========================================
-        document.getElementById('login-btn').addEventListener('click', () => {
-            if (currentUser) {
-                signOut(auth);
-            } else {
-                signInWithPopup(auth, provider).catch(error => console.error("Login failed:", error));
-            }
+        const handleAuthClick = () => {
+            if (currentUser) signOut(auth);
+            else signInWithPopup(auth, provider).catch(error => console.error("Login failed:", error));
+        };
+        
+        // Bind to desktop and mobile buttons
+        document.querySelectorAll('.auth-btn').forEach(btn => btn.addEventListener('click', handleAuthClick));
+        document.querySelectorAll('.upgrade-btn').forEach(btn => {
+            btn.addEventListener('click', () => document.getElementById('pro-modal').classList.remove('modal-hidden'));
         });
 
         onAuthStateChanged(auth, async (user) => {
-            const loginBtn = document.getElementById('login-btn');
             if (user) {
                 currentUser = user;
-                loginBtn.textContent = "Log Out";
+                document.querySelectorAll('.auth-btn').forEach(btn => btn.textContent = "Log Out");
                 await fetchOrCreateUserProfile(user);
                 updateUI();
             } else {
                 currentUser = null;
                 userData = { plan: 'free', downloadsToday: 0, lastDownloadDate: '', history: [] };
-                loginBtn.textContent = "Log In with Google";
+                document.querySelectorAll('.auth-btn').forEach(btn => btn.textContent = "Log In with Google");
                 updateUI();
             }
         });
@@ -503,148 +579,125 @@
             if (docSnap.exists()) {
                 userData = docSnap.data();
                 if (!userData.history) userData.history = [];
-                // Reset daily limit if it's a new day
                 if (userData.lastDownloadDate !== today) {
                     userData.downloadsToday = 0;
                     userData.lastDownloadDate = today;
                     await updateDoc(userRef, { downloadsToday: 0, lastDownloadDate: today });
                 }
             } else {
-                userData = {
-                    plan: 'free',
-                    downloadsToday: 0,
-                    lastDownloadDate: today,
-                    email: user.email,
-                    name: user.displayName,
-                    history: []
-                };
+                userData = { plan: 'free', downloadsToday: 0, lastDownloadDate: today, email: user.email, name: user.displayName, history: [] };
                 await setDoc(userRef, userData);
             }
         }
 
-        // ==========================================
-        // 4. STRIPE CHECKOUT
-        // ==========================================
         window.checkout = function(tier) {
-            if (!currentUser) {
-                alert("Please log in first to upgrade.");
-                return;
-            }
-            
-            let link = "";
-            if (tier === 'creator') link = STRIPE_LINK_CREATOR;
-            if (tier === 'pro') link = STRIPE_LINK_PRO;
-            if (tier === 'lifetime') link = STRIPE_LINK_LIFETIME;
-
-            // Pass the Firebase UID to Stripe via client_reference_id
+            if (!currentUser) return alert("Please log in first to upgrade.");
+            let link = tier === 'creator' ? STRIPE_LINK_CREATOR : (tier === 'pro' ? STRIPE_LINK_PRO : STRIPE_LINK_LIFETIME);
             window.location.href = `${link}?client_reference_id=${currentUser.uid}`;
         };
 
         // ==========================================
-        // 5. DOWNLOAD LOGIC
-        // ==========================================
-        window.downloadTrack = async function(id) {
-            if (!currentUser) {
-                alert("Please log in to download sounds.");
-                return;
-            }
-
-            const today = new Date().toISOString().split('T')[0];
-            const userRef = doc(db, "users", currentUser.uid);
-
-            if (userData.plan === 'free') {
-                if (userData.lastDownloadDate !== today) userData.downloadsToday = 0;
-                
-                if (userData.downloadsToday >= 2) {
-                    document.getElementById('pro-modal').classList.remove('modal-hidden');
-                    return;
-                }
-            }
-
-            // Execute Download
-            const sound = soundsDB.find(s => s.id === id);
-            const a = document.createElement('a'); 
-            a.href = sound.previewURL; 
-            a.download = `${sound.title}.ogg`;
-            document.body.appendChild(a); 
-            a.click(); 
-            document.body.removeChild(a);
-
-            // Update Database
-            userData.downloadsToday += 1;
-            userData.lastDownloadDate = today;
-            if (!userData.history.includes(id)) userData.history.push(id);
-            
-            await updateDoc(userRef, {
-                downloadsToday: userData.downloadsToday,
-                lastDownloadDate: today,
-                history: userData.history
-            });
-
-            if(userData.plan === 'free') {
-                alert(`Downloaded! Free downloads remaining today: ${Math.max(0, 2 - userData.downloadsToday)}`);
-            }
-            renderDashboard();
-            renderSounds();
-        };
-
-        // ==========================================
-        // 6. UI & RENDER LOGIC
+        // 4. UI LOGIC (Views, Filters)
         // ==========================================
         function updateUI() {
-            const upgradeBtn = document.getElementById('upgrade-btn');
-            // Check if they are any of the paid tiers
-            const isPaidPlan = userData.plan === 'pro' || userData.plan === 'creator' || userData.plan === 'lifetime';
+            const isPaidPlan = ['pro', 'creator', 'lifetime'].includes(userData.plan);
             
-            if (isPaidPlan) {
-                upgradeBtn.textContent = "Pro Active";
-                upgradeBtn.classList.replace('primary', 'secondary');
-                upgradeBtn.disabled = true;
-            } else {
-                upgradeBtn.textContent = "Upgrade to Pro";
-                upgradeBtn.classList.replace('secondary', 'primary');
-                upgradeBtn.disabled = false;
-            }
+            document.querySelectorAll('.upgrade-btn').forEach(btn => {
+                if (isPaidPlan) {
+                    btn.textContent = "Pro Active";
+                    btn.classList.replace('primary', 'secondary');
+                    btn.disabled = true;
+                } else {
+                    btn.textContent = "Upgrade to Pro";
+                    btn.classList.replace('secondary', 'primary');
+                    btn.disabled = false;
+                }
+            });
+
+            renderFilters();
             renderSounds();
             renderDashboard();
             renderProjects();
         }
 
         window.switchTab = function(tabId) {
-            document.getElementById('library-view').classList.replace('view-active', 'view-hidden');
-            document.getElementById('dashboard-view').classList.replace('view-active', 'view-hidden');
-            document.getElementById('projects-view').classList.replace('view-active', 'view-hidden');
+            ['library-view', 'dashboard-view', 'projects-view'].forEach(v => document.getElementById(v).classList.replace('view-active', 'view-hidden'));
+            document.getElementById(`${tabId}-view`).classList.replace('view-hidden', 'view-active');
 
-            const targetView = tabId === 'library' ? 'library-view' : (tabId === 'projects' ? 'projects-view' : 'dashboard-view');
-            document.getElementById(targetView).classList.replace('view-hidden', 'view-active');
-
-            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`nav-${tabId}`).classList.add('active');
+            document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`nav-${tabId}`)?.classList.add('active');
+            document.getElementById(`mob-nav-${tabId}`)?.classList.add('active');
         };
+
+        function renderFilters() {
+            const container = document.getElementById('advanced-filters-container');
+            container.innerHTML = '';
+            
+            // "Pro Editor" or "Lifetime" get the advanced filters unlocked.
+            const hasAdvancedAccess = ['pro', 'lifetime'].includes(userData.plan);
+            const lockIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+
+            advancedTags.forEach(tag => {
+                const btn = document.createElement('button');
+                btn.className = `filter-btn adv-filter ${!hasAdvancedAccess ? 'locked' : ''} ${currentFilter === tag ? 'active' : ''}`;
+                btn.innerHTML = `${!hasAdvancedAccess ? lockIcon : ''} ${tag}`;
+                
+                btn.addEventListener('click', (e) => {
+                    if (!hasAdvancedAccess) {
+                        btn.classList.add('wiggle');
+                        setTimeout(() => btn.classList.remove('wiggle'), 400);
+                        document.getElementById('pro-modal').classList.remove('modal-hidden');
+                        return;
+                    }
+                    
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = tag;
+                    renderSounds();
+                });
+                container.appendChild(btn);
+            });
+
+            // Re-bind base filters
+            document.querySelectorAll('.base-filter').forEach(btn => {
+                // remove old listeners by cloning
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                newBtn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    newBtn.classList.add('active');
+                    currentFilter = newBtn.dataset.filter;
+                    renderSounds();
+                });
+            });
+        }
 
         function renderSounds() {
             const list = document.getElementById('sound-list');
             list.innerHTML = '';
             
-            const filtered = soundsDB.filter(s => 
-                (currentFilter === 'all' || s.category === currentFilter) &&
-                (s.title.toLowerCase().includes(searchQuery.toLowerCase()) || s.tags.toLowerCase().includes(searchQuery.toLowerCase()))
-            );
+            const filtered = soundsDB.filter(s => {
+                const matchesSearch = s.title.toLowerCase().includes(searchQuery.toLowerCase()) || s.tags.toLowerCase().includes(searchQuery.toLowerCase());
+                
+                if (currentFilter === 'all') return matchesSearch;
+                if (['sfx', 'music'].includes(currentFilter)) return matchesSearch && s.category === currentFilter;
+                
+                // Advanced tag match
+                return matchesSearch && s.tags.includes(currentFilter);
+            });
 
             if (filtered.length === 0) {
                 list.innerHTML = `<p style="text-align:center; color: var(--text-secondary); padding: 3rem;">No sounds found. Try another search.</p>`;
                 return;
             }
 
-            filtered.forEach(sound => {
-                const isPaidPlan = userData.plan === 'pro' || userData.plan === 'creator' || userData.plan === 'lifetime';
-                const canDownload = currentUser && (isPaidPlan || userData.downloadsToday < 2);
-                
-                // Switch icon visually if they hit limit
-                const dlIcon = canDownload 
-                    ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`
-                    : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+            const isPaidPlan = ['pro', 'creator', 'lifetime'].includes(userData.plan);
+            const canDownload = currentUser && (isPaidPlan || userData.downloadsToday < 2);
+            const dlIcon = canDownload 
+                ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`
+                : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
 
+            filtered.forEach(sound => {
                 list.insertAdjacentHTML('beforeend', `
                     <div class="sound-card">
                         <div class="sound-info">
@@ -657,18 +710,84 @@
                             </div>
                         </div>
                         <div class="sound-actions">
-                            <button class="action-btn" onclick="openAddToProjectModal(${sound.id})" title="Save to Project">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
-                            </button>
-                            <button class="action-btn" onclick="downloadTrack(${sound.id})" title="Download">
-                                ${dlIcon}
-                            </button>
+                            <button class="action-btn" onclick="openAddToProjectModal(${sound.id})" title="Save to Project"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg></button>
+                            <button class="action-btn" onclick="downloadTrack(${sound.id})" title="Download">${dlIcon}</button>
                         </div>
                     </div>
                 `);
             });
         }
 
+        // ==========================================
+        // 5. ADVANCED AUDIO PLAYER
+        // ==========================================
+        const audio = document.getElementById('audio-element');
+        let isLooping = false;
+
+        window.playTrack = function(id) {
+            const track = soundsDB.find(s => s.id === id);
+            document.getElementById('player-title').textContent = track.title;
+            document.getElementById('player-tags').textContent = track.tags;
+            document.getElementById('global-player').classList.remove('player-hidden');
+            audio.src = track.previewURL; 
+            audio.play();
+            document.getElementById('play-icon').style.display = 'none'; 
+            document.getElementById('pause-icon').style.display = 'block';
+        };
+
+        // Play/Pause
+        document.getElementById('play-pause-btn').addEventListener('click', () => {
+            if(audio.paused) { audio.play(); document.getElementById('play-icon').style.display='none'; document.getElementById('pause-icon').style.display='block'; }
+            else { audio.pause(); document.getElementById('play-icon').style.display='block'; document.getElementById('pause-icon').style.display='none'; }
+        });
+
+        // Progress Bar
+        audio.addEventListener('timeupdate', () => {
+            if(audio.duration) {
+                document.getElementById('progress-bar').style.width = `${(audio.currentTime/audio.duration)*100}%`;
+                const min = Math.floor(audio.currentTime/60), sec = Math.floor(audio.currentTime%60);
+                const dMin = Math.floor(audio.duration/60), dSec = Math.floor(audio.duration%60);
+                document.getElementById('current-time').textContent = `${min}:${sec<10?'0':''}${sec}`;
+                document.getElementById('total-time').textContent = `${dMin}:${dSec<10?'0':''}${dSec}`;
+            }
+        });
+
+        document.getElementById('progress-wrapper').addEventListener('click', (e) => {
+            if (audio.duration) audio.currentTime = (e.offsetX / document.getElementById('progress-wrapper').clientWidth) * audio.duration;
+        });
+
+        // Rewind & Forward (-5s / +5s)
+        document.getElementById('rewind-btn').addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 5); });
+        document.getElementById('forward-btn').addEventListener('click', () => { audio.currentTime = Math.min(audio.duration, audio.currentTime + 5); });
+
+        // Loop Toggle
+        document.getElementById('loop-btn').addEventListener('click', (e) => {
+            isLooping = !isLooping;
+            audio.loop = isLooping;
+            e.currentTarget.classList.toggle('active', isLooping);
+        });
+
+        // Volume & Mute
+        const volSlider = document.getElementById('volume-slider');
+        volSlider.addEventListener('input', (e) => {
+            audio.volume = e.target.value;
+            if(audio.volume === 0) muteUI(true); else muteUI(false);
+        });
+
+        document.getElementById('mute-btn').addEventListener('click', () => {
+            audio.muted = !audio.muted;
+            muteUI(audio.muted);
+            if(!audio.muted && audio.volume === 0) { audio.volume = 0.5; volSlider.value = 0.5; }
+        });
+
+        function muteUI(isMuted) {
+            document.getElementById('vol-icon').style.display = isMuted ? 'none' : 'block';
+            document.getElementById('mute-icon').style.display = isMuted ? 'block' : 'none';
+        }
+
+        // ==========================================
+        // 6. DASHBOARD & DOWNLOADS
+        // ==========================================
         function renderDashboard() {
             if (currentUser) {
                 document.getElementById('dash-name').textContent = currentUser.displayName || 'Creator';
@@ -676,7 +795,7 @@
                 document.getElementById('dash-avatar').textContent = (currentUser.displayName || 'C').charAt(0).toUpperCase();
                 
                 const planEl = document.getElementById('dash-plan');
-                const isPaidPlan = userData.plan === 'pro' || userData.plan === 'creator' || userData.plan === 'lifetime';
+                const isPaidPlan = ['pro', 'creator', 'lifetime'].includes(userData.plan);
                 
                 if(isPaidPlan) { 
                     planEl.textContent = `UNSTUNTED ${userData.plan.toUpperCase()}`; 
@@ -714,20 +833,41 @@
             }
         }
 
+        window.downloadTrack = async function(id) {
+            if (!currentUser) return alert("Please log in to download sounds.");
+
+            const today = new Date().toISOString().split('T')[0];
+            const userRef = doc(db, "users", currentUser.uid);
+
+            if (userData.plan === 'free') {
+                if (userData.lastDownloadDate !== today) userData.downloadsToday = 0;
+                if (userData.downloadsToday >= 2) return document.getElementById('pro-modal').classList.remove('modal-hidden');
+            }
+
+            const sound = soundsDB.find(s => s.id === id);
+            const a = document.createElement('a'); a.href = sound.previewURL; a.download = `${sound.title}.ogg`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+
+            userData.downloadsToday += 1;
+            userData.lastDownloadDate = today;
+            if (!userData.history.includes(id)) userData.history.push(id);
+            await updateDoc(userRef, { downloadsToday: userData.downloadsToday, lastDownloadDate: today, history: userData.history });
+
+            if(userData.plan === 'free') alert(`Downloaded! Free downloads remaining today: ${Math.max(0, 2 - userData.downloadsToday)}`);
+            renderDashboard(); renderSounds();
+        };
+
         // ==========================================
-        // 7. PROJECTS SYSTEM (Local Storage)
+        // 7. PROJECTS SYSTEM 
         // ==========================================
         document.getElementById('create-project-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const nameInput = document.getElementById('new-project-name');
             const newProj = { id: Date.now().toString(), name: nameInput.value, sounds: [] };
-            
             userProjects.push(newProj);
             localStorage.setItem('unstuntedsfx_projects', JSON.stringify(userProjects));
-            
             document.getElementById('create-project-modal').classList.add('modal-hidden');
             nameInput.value = '';
-            
             if(currentSoundToAdd) addSoundToProject(newProj.id);
             renderProjects();
         });
@@ -736,18 +876,11 @@
             currentSoundToAdd = soundId;
             const list = document.getElementById('project-selection-list');
             list.innerHTML = '';
-            
-            if(userProjects.length === 0) {
-                list.innerHTML = `<p style="text-align:center; color: var(--text-secondary); padding: 1rem 0;">No projects yet.</p>`;
-            } else {
+            if(userProjects.length === 0) { list.innerHTML = `<p style="text-align:center; color: var(--text-secondary); padding: 1rem 0;">No projects yet.</p>`; } 
+            else {
                 userProjects.forEach(p => {
                     const inProject = p.sounds.includes(soundId);
-                    list.insertAdjacentHTML('beforeend', `
-                        <button class="project-select-btn ${inProject ? 'disabled' : ''}" onclick="addSoundToProject('${p.id}')">
-                            <span style="font-weight: 500;">${p.name}</span>
-                            ${inProject ? '<span style="font-size: 0.85rem; color: var(--text-secondary);">Added ✓</span>' : '<span class="add-text">+ Add</span>'}
-                        </button>
-                    `);
+                    list.insertAdjacentHTML('beforeend', `<button class="project-select-btn ${inProject ? 'disabled' : ''}" onclick="addSoundToProject('${p.id}')"><span style="font-weight: 500;">${p.name}</span>${inProject ? '<span style="font-size: 0.85rem; color: var(--text-secondary);">Added ✓</span>' : '<span class="add-text">+ Add</span>'}</button>`);
                 });
             }
             document.getElementById('add-to-project-modal').classList.remove('modal-hidden');
@@ -755,10 +888,7 @@
 
         window.addSoundToProject = function(projectId) {
             const proj = userProjects.find(p => p.id === projectId);
-            if(proj && !proj.sounds.includes(currentSoundToAdd)) {
-                proj.sounds.push(currentSoundToAdd);
-                localStorage.setItem('unstuntedsfx_projects', JSON.stringify(userProjects));
-            }
+            if(proj && !proj.sounds.includes(currentSoundToAdd)) { proj.sounds.push(currentSoundToAdd); localStorage.setItem('unstuntedsfx_projects', JSON.stringify(userProjects)); }
             document.getElementById('add-to-project-modal').classList.add('modal-hidden');
             currentSoundToAdd = null;
         };
@@ -766,164 +896,34 @@
         window.renderProjects = function() {
             const grid = document.getElementById('projects-grid');
             grid.innerHTML = '';
-            
-            if (userProjects.length === 0) {
-                grid.innerHTML = `
-                    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem;">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" style="margin-bottom: 1rem;"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-                        <h3 style="margin-bottom: 0.5rem;">Organize Your Sounds</h3>
-                        <p style="color: var(--text-secondary);">Start your first project to save sound effects and music.</p>
-                    </div>`;
-                return;
-            }
-
-            userProjects.forEach(p => {
-                grid.insertAdjacentHTML('beforeend', `
-                    <div class="card" style="cursor: pointer; transition: transform 0.2s, background 0.2s;" onclick="openProjectDetail('${p.id}')" onmouseover="this.style.transform='scale(1.02)'; this.style.background='rgba(44,44,46,0.8)'" onmouseout="this.style.transform='scale(1)'; this.style.background='var(--card-bg)'">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" style="margin-bottom: 1rem;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                        <h3 style="margin-bottom: 0.5rem;">${p.name}</h3>
-                        <p style="color: var(--text-secondary); font-size: 0.8rem;">${p.sounds.length} sound${p.sounds.length === 1 ? '' : 's'}</p>
-                    </div>
-                `);
-            });
+            if (userProjects.length === 0) { grid.innerHTML = `<div class="card" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" style="margin-bottom: 1rem;"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg><h3 style="margin-bottom: 0.5rem;">Organize Your Sounds</h3><p style="color: var(--text-secondary);">Start your first project to save sound effects and music.</p></div>`; return; }
+            userProjects.forEach(p => { grid.insertAdjacentHTML('beforeend', `<div class="card" style="cursor: pointer; transition: transform 0.2s, background 0.2s;" onclick="openProjectDetail('${p.id}')" onmouseover="this.style.transform='scale(1.02)'; this.style.background='rgba(44,44,46,0.8)'" onmouseout="this.style.transform='scale(1)'; this.style.background='var(--card-bg)'"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" style="margin-bottom: 1rem;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg><h3 style="margin-bottom: 0.5rem;">${p.name}</h3><p style="color: var(--text-secondary); font-size: 0.8rem;">${p.sounds.length} sound${p.sounds.length === 1 ? '' : 's'}</p></div>`); });
         };
 
         window.openProjectDetail = function(projectId) {
             const proj = userProjects.find(p => p.id === projectId);
             if(!proj) return;
-            
-            document.getElementById('projects-main').classList.add('view-hidden');
-            document.getElementById('project-detail').classList.remove('view-hidden');
+            document.getElementById('projects-main').classList.add('view-hidden'); document.getElementById('project-detail').classList.remove('view-hidden');
             document.getElementById('detail-project-name').textContent = proj.name;
-            
-            const list = document.getElementById('detail-sound-list');
-            list.innerHTML = '';
-            
-            if(proj.sounds.length === 0) {
-                list.innerHTML = `<p style="color: var(--text-secondary);">No sounds added yet.</p>`;
-                return;
-            }
-            
+            const list = document.getElementById('detail-sound-list'); list.innerHTML = '';
+            if(proj.sounds.length === 0) { list.innerHTML = `<p style="color: var(--text-secondary);">No sounds added yet.</p>`; return; }
             proj.sounds.forEach(soundId => {
                 const sound = soundsDB.find(s => s.id === soundId);
-                if(sound) {
-                    list.insertAdjacentHTML('beforeend', `
-                        <div class="sound-card">
-                            <div class="sound-info">
-                                <button class="play-trigger" onclick="playTrack(${sound.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
-                                <div><h4 style="font-size:1.1rem; margin-bottom:0.2rem;">${sound.title}</h4></div>
-                            </div>
-                            <button class="action-btn" onclick="removeFromProject('${proj.id}', ${sound.id})" style="color: #ff453a;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
-                        </div>
-                    `);
-                }
+                if(sound) { list.insertAdjacentHTML('beforeend', `<div class="sound-card"><div class="sound-info"><button class="play-trigger" onclick="playTrack(${sound.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button><div><h4 style="font-size:1.1rem; margin-bottom:0.2rem;">${sound.title}</h4></div></div><button class="action-btn" onclick="removeFromProject('${proj.id}', ${sound.id})" style="color: #ff453a;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>`); }
             });
         };
 
-        window.closeProjectDetail = function() {
-            document.getElementById('project-detail').classList.add('view-hidden');
-            document.getElementById('projects-main').classList.remove('view-hidden');
-            renderProjects();
-        };
+        window.closeProjectDetail = function() { document.getElementById('project-detail').classList.add('view-hidden'); document.getElementById('projects-main').classList.remove('view-hidden'); renderProjects(); };
+        window.removeFromProject = function(projectId, soundId) { const proj = userProjects.find(p => p.id === projectId); if(proj) { proj.sounds = proj.sounds.filter(id => id !== soundId); localStorage.setItem('unstuntedsfx_projects', JSON.stringify(userProjects)); openProjectDetail(projectId); } };
 
-        window.removeFromProject = function(projectId, soundId) {
-            const proj = userProjects.find(p => p.id === projectId);
-            if(proj) {
-                proj.sounds = proj.sounds.filter(id => id !== soundId);
-                localStorage.setItem('unstuntedsfx_projects', JSON.stringify(userProjects));
-                openProjectDetail(projectId);
-            }
-        };
-
-        // ==========================================
-        // 8. AUDIO PLAYER & SEARCH LOGIC
-        // ==========================================
+        // SEARCH
         document.getElementById('search-input').addEventListener('input', (e) => { searchQuery = e.target.value; renderSounds(); });
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active'); currentFilter = e.target.dataset.filter; renderSounds();
-            });
-        });
 
-        const audio = document.getElementById('audio-element');
-        window.playTrack = function(id) {
-            const track = soundsDB.find(s => s.id === id);
-            document.getElementById('player-title').textContent = track.title;
-            document.getElementById('player-tags').textContent = track.tags;
-            document.getElementById('global-player').classList.remove('player-hidden');
-            audio.src = track.previewURL; audio.play();
-            document.getElementById('play-icon').style.display = 'none'; document.getElementById('pause-icon').style.display = 'block';
-        };
+        // HUMMING MODAL 
+        window.stopHummingSearch = function() { document.getElementById('hum-modal').classList.add('modal-hidden'); };
 
-        document.getElementById('play-pause-btn').addEventListener('click', () => {
-            if(audio.paused) { audio.play(); document.getElementById('play-icon').style.display='none'; document.getElementById('pause-icon').style.display='block'; }
-            else { audio.pause(); document.getElementById('play-icon').style.display='block'; document.getElementById('pause-icon').style.display='none'; }
-        });
-
-        audio.addEventListener('timeupdate', () => {
-            if(audio.duration) {
-                document.getElementById('progress-bar').style.width = `${(audio.currentTime/audio.duration)*100}%`;
-                const min = Math.floor(audio.currentTime/60), sec = Math.floor(audio.currentTime%60);
-                const dMin = Math.floor(audio.duration/60), dSec = Math.floor(audio.duration%60);
-                document.getElementById('current-time').textContent = `${min}:${sec<10?'0':''}${sec}`;
-                document.getElementById('total-time').textContent = `${dMin}:${dSec<10?'0':''}${dSec}`;
-            }
-        });
-
-        document.getElementById('progress-wrapper').addEventListener('click', (e) => {
-            if (audio.duration) audio.currentTime = (e.offsetX / document.getElementById('progress-wrapper').clientWidth) * audio.duration;
-        });
-
-        // Humming Feature
-        let actx, anl, aid, ht, pt;
-        const ctx = document.getElementById('audio-canvas').getContext('2d');
-        
-        document.getElementById('mic-search-btn').addEventListener('click', async () => {
-            document.getElementById('hum-modal').classList.remove('modal-hidden');
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                document.getElementById('hum-status').textContent = "Listening...";
-                document.getElementById('hum-subtext').textContent = "Hum a tune...";
-                actx = new (window.AudioContext || window.webkitAudioContext)();
-                anl = actx.createAnalyser();
-                actx.createMediaStreamSource(stream).connect(anl);
-                const data = new Uint8Array(anl.frequencyBinCount);
-                
-                function draw() {
-                    aid = requestAnimationFrame(draw); anl.getByteFrequencyData(data);
-                    ctx.clearRect(0,0,300,100); ctx.fillStyle = '#0A84FF';
-                    for(let i=0, x=0; i<anl.frequencyBinCount; i++, x+=2.5) {
-                        ctx.beginPath();
-                        ctx.roundRect(x, (100-(data[i]/2))/2, 2, data[i]/2||2, [2]);
-                        ctx.fill();
-                    }
-                }
-                draw();
-                
-                ht = setTimeout(() => {
-                    cancelAnimationFrame(aid); stream.getTracks().forEach(t=>t.stop());
-                    document.getElementById('hum-status').textContent = "Analyzing...";
-                    pt = setTimeout(() => {
-                        window.stopHummingSearch();
-                        const si = document.getElementById('search-input');
-                        si.value = "Ambience"; si.dispatchEvent(new Event('input'));
-                    }, 1500);
-                }, 4000);
-            } catch(e) { 
-                document.getElementById('hum-status').textContent = "Mic Denied"; 
-                document.getElementById('hum-subtext').textContent = "Please allow mic permissions in your browser.";
-            }
-        });
-
-        window.stopHummingSearch = function() {
-            document.getElementById('hum-modal').classList.add('modal-hidden');
-            if(aid) cancelAnimationFrame(aid); if(actx) actx.close(); clearTimeout(ht); clearTimeout(pt);
-        };
-
-        // Initialize on load
+        // INITIALIZE
+        renderFilters();
         renderSounds();
         renderProjects();
         renderDashboard();
