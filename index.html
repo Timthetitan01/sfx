@@ -132,11 +132,12 @@
             .progress-container { width: 100%; }
         }
 
-        /* --- MODALS --- */
+        /* --- MODALS & PRICING --- */
         .modal-hidden { opacity: 0 !important; visibility: hidden !important; pointer-events: none; }
-        .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 4000; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; }
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(40px); border: 1px solid var(--glass-border); border-radius: 32px; padding: 3rem; text-align: center; position: relative; width: 90%; max-width: 450px; }
-        .close-btn { position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(255,255,255,0.1); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+        .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 4000; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; padding: 2rem; overflow-y: auto;}
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(40px); border: 1px solid var(--glass-border); border-radius: 32px; padding: 3rem; text-align: center; position: relative; width: 100%; max-width: 450px; margin: auto; }
+        .glass-panel.wide { max-width: 1000px; padding: 3rem 2.5rem; }
+        .close-btn { position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(255,255,255,0.1); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; transition: transform 0.2s, background 0.2s; z-index: 10; }
         .close-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
         .input-group { margin-bottom: 1.2rem; text-align: left; }
         .input-group label { font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px;}
@@ -147,6 +148,22 @@
         .project-select-btn:hover { background: rgba(255,255,255,0.1); }
         .project-select-btn.disabled { opacity: 0.5; cursor: not-allowed; }
         .add-text { color: var(--accent-blue); font-size: 0.85rem; font-weight: 500; }
+
+        /* Pricing Grid inside Modal */
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2.5rem; align-items: stretch; }
+        .pricing-card { background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 2rem 1.5rem; border-radius: 20px; display: flex; flex-direction: column; text-align: left; position: relative; }
+        .pricing-card.popular { border-color: var(--accent-blue); background: rgba(10, 132, 255, 0.05); transform: scale(1.02); z-index: 1; box-shadow: 0 10px 30px rgba(10, 132, 255, 0.1); }
+        .pricing-card.limited { border-color: #ff9f0a; background: rgba(255, 159, 10, 0.05); }
+        .pricing-card h4 { font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 600; color: #fff; }
+        .pricing-card .price { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff; }
+        .pricing-card .price span { font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); }
+        .pricing-card p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.4; min-height: 40px; }
+        .pricing-card ul.features { list-style: none; margin-bottom: 2rem; flex: 1; }
+        .pricing-card ul.features li { font-size: 0.85rem; margin-bottom: 0.8rem; color: var(--text-primary); display: flex; align-items: start; gap: 0.5rem;}
+        .pricing-card .cta-btn { width: 100%; margin-top: auto; }
+        .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 12px; white-space: nowrap; }
+        .pricing-card.popular .badge { background: var(--accent-blue); color: #fff; }
+        .pricing-card.limited .badge { background: #ff9f0a; color: #000; }
     </style>
 </head>
 <body>
@@ -311,11 +328,65 @@
     </div>
 
     <div id="pro-modal" class="modal modal-hidden">
-        <div class="glass-panel" style="text-align: left;">
+        <div class="glass-panel wide">
             <button class="close-btn" onclick="document.getElementById('pro-modal').classList.add('modal-hidden')">&times;</button>
-            <h3 style="margin-bottom: 0.5rem; text-align: center;">UNSTUNTED<span>PRO</span></h3>
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem; text-align: center;">$15/mo for unlimited downloads. Secure checkout via Stripe.</p>
-            <button class="cta-btn primary" style="width: 100%;" id="stripe-checkout-btn">Proceed to Checkout</button>
+            <h3 style="margin-bottom: 0.5rem; font-size: 2.2rem;">Upgrade your workflow.</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Select the plan that fits your editing style. Secure checkout via Stripe.</p>
+            
+            <div class="pricing-grid">
+                
+                <div class="pricing-card">
+                    <h4>Free Tier</h4>
+                    <div class="price">$0</div>
+                    <p>Get started in our ecosystem.</p>
+                    <ul class="features">
+                        <li><span>✔</span> 2 downloads / day</li>
+                        <li><span>✔</span> Access to categories</li>
+                        <li><span>✔</span> Basic search bar</li>
+                    </ul>
+                    <button class="cta-btn secondary" disabled>Current Plan</button>
+                </div>
+
+                <div class="pricing-card popular">
+                    <div class="badge">Most Popular</div>
+                    <h4>Creator Tier</h4>
+                    <div class="price">$7<span>/mo</span></div>
+                    <p>Never worry about copyright strikes again.</p>
+                    <ul class="features">
+                        <li><span>✔</span> Unlimited downloads</li>
+                        <li><span>✔</span> Advanced search bar</li>
+                        <li><span>✔</span> Trending sounds this month</li>
+                    </ul>
+                    <button class="cta-btn primary" onclick="checkout('creator')">Upgrade to Creator</button>
+                </div>
+
+                <div class="pricing-card">
+                    <h4>Pro Editor</h4>
+                    <div class="price">$12<span>/mo</span></div>
+                    <p>For professional editors and agencies.</p>
+                    <ul class="features">
+                        <li><span>✔</span> Everything in Creator</li>
+                        <li><span>✔</span> Mic Search (Hum/Sing)</li>
+                        <li><span>✔</span> Top 10 SFX Trending</li>
+                        <li><span>✔</span> Early access & Editor Packs</li>
+                        <li><span>✔</span> Advanced filters</li>
+                    </ul>
+                    <button class="cta-btn primary" onclick="checkout('pro')">Upgrade to Pro</button>
+                </div>
+
+                <div class="pricing-card limited">
+                    <div class="badge">Limited: First 200 Users</div>
+                    <h4>Launch Lifetime</h4>
+                    <div class="price">$89<span>/once</span></div>
+                    <p>Founding Creator Lifetime — never pay again.</p>
+                    <ul class="features">
+                        <li><span>✔</span> Everything in Pro Editor</li>
+                        <li><span>✔</span> Pay once, own forever</li>
+                    </ul>
+                    <button class="cta-btn primary" onclick="checkout('lifetime')" style="background-color: #ff9f0a; color: #000;">Claim Lifetime</button>
+                </div>
+
+            </div>
         </div>
     </div>
 
@@ -327,16 +398,20 @@
         // ==========================================
         // 1. ADD YOUR CONFIGURATION HERE
         // ==========================================
-    const firebaseConfig = {
-  apiKey: "AIzaSyAjemYDX-2--f1DZMlnkiyEDTkG5rsyRPw",
-  authDomain: "unstuntedsfx.firebaseapp.com",
-  projectId: "unstuntedsfx",
-  storageBucket: "unstuntedsfx.firebasestorage.app",
-  messagingSenderId: "402867152204",
-  appId: "1:402867152204:web:ae36692d8834a4b1601be9",
-  measurementId: "G-PJTBJ12BM1"
-};
-        const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_YOUR_LINK_HERE"; 
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjemYDX-2--f1DZMlnkiyEDTkG5rsyRPw",
+            authDomain: "unstuntedsfx.firebaseapp.com",
+            projectId: "unstuntedsfx",
+            storageBucket: "unstuntedsfx.firebasestorage.app",
+            messagingSenderId: "402867152204",
+            appId: "1:402867152204:web:ae36692d8834a4b1601be9",
+            measurementId: "G-PJTBJ12BM1"
+        };
+        
+        // ADD YOUR STRIPE PAYMENT LINKS HERE
+        const STRIPE_LINK_CREATOR = "https://buy.stripe.com/test_YOUR_CREATOR_LINK_HERE"; 
+        const STRIPE_LINK_PRO = "https://buy.stripe.com/test_YOUR_PRO_LINK_HERE"; 
+        const STRIPE_LINK_LIFETIME = "https://buy.stripe.com/test_YOUR_LIFETIME_LINK_HERE"; 
 
         // ==========================================
         // 2. INITIALIZATION & STATE
@@ -416,16 +491,22 @@
         }
 
         // ==========================================
-        // 4. STRIPE INTEGRATION
+        // 4. STRIPE CHECKOUT
         // ==========================================
-        document.getElementById('stripe-checkout-btn').addEventListener('click', () => {
+        window.checkout = function(tier) {
             if (!currentUser) {
                 alert("Please log in first to upgrade.");
                 return;
             }
+            
+            let link = "";
+            if (tier === 'creator') link = STRIPE_LINK_CREATOR;
+            if (tier === 'pro') link = STRIPE_LINK_PRO;
+            if (tier === 'lifetime') link = STRIPE_LINK_LIFETIME;
+
             // Pass the Firebase UID to Stripe via client_reference_id
-            window.location.href = `${STRIPE_PAYMENT_LINK}?client_reference_id=${currentUser.uid}`;
-        });
+            window.location.href = `${link}?client_reference_id=${currentUser.uid}`;
+        };
 
         // ==========================================
         // 5. DOWNLOAD LOGIC
@@ -480,7 +561,10 @@
         // ==========================================
         function updateUI() {
             const upgradeBtn = document.getElementById('upgrade-btn');
-            if (userData.plan === 'pro') {
+            // Check if they are any of the paid tiers
+            const isPaidPlan = userData.plan === 'pro' || userData.plan === 'creator' || userData.plan === 'lifetime';
+            
+            if (isPaidPlan) {
                 upgradeBtn.textContent = "Pro Active";
                 upgradeBtn.classList.replace('primary', 'secondary');
                 upgradeBtn.disabled = true;
@@ -521,8 +605,8 @@
             }
 
             filtered.forEach(sound => {
-                const isPro = userData.plan === 'pro';
-                const canDownload = currentUser && (isPro || userData.downloadsToday < 2);
+                const isPaidPlan = userData.plan === 'pro' || userData.plan === 'creator' || userData.plan === 'lifetime';
+                const canDownload = currentUser && (isPaidPlan || userData.downloadsToday < 2);
                 
                 // Switch icon visually if they hit limit
                 const dlIcon = canDownload 
@@ -560,8 +644,10 @@
                 document.getElementById('dash-avatar').textContent = (currentUser.displayName || 'C').charAt(0).toUpperCase();
                 
                 const planEl = document.getElementById('dash-plan');
-                if(userData.plan === 'pro') { 
-                    planEl.textContent = "UNSTUNTED PRO"; 
+                const isPaidPlan = userData.plan === 'pro' || userData.plan === 'creator' || userData.plan === 'lifetime';
+                
+                if(isPaidPlan) { 
+                    planEl.textContent = `UNSTUNTED ${userData.plan.toUpperCase()}`; 
                     planEl.style.color = "var(--accent-blue)"; 
                 } else {
                     planEl.textContent = `Free Tier (${userData.downloadsToday}/2 used today)`; 
