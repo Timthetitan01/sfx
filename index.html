@@ -997,14 +997,39 @@
         // ==========================================
         // 7. PROJECTS SYSTEM 
         // ==========================================
+        
+        // PROJECT LIMITS ADDED HERE
         document.getElementById('create-project-form').addEventListener('submit', (e) => {
             e.preventDefault();
+
+            // Enforce log in to create projects
+            if (!currentUser) {
+                document.getElementById('create-project-modal').classList.add('modal-hidden');
+                document.getElementById('auth-modal').classList.remove('modal-hidden');
+                return;
+            }
+
+            // Check Limits based on Tier
+            const plan = userData.plan || 'free';
+            let maxProjects = 1;
+            if (plan === 'creator') maxProjects = 5;
+            if (plan === 'pro' || plan === 'lifetime') maxProjects = Infinity;
+
+            if (userProjects.length >= maxProjects) {
+                document.getElementById('create-project-modal').classList.add('modal-hidden');
+                document.getElementById('pro-modal').classList.remove('modal-hidden');
+                return; // Stop project creation
+            }
+
+            // Create Project
             const nameInput = document.getElementById('new-project-name');
             const newProj = { id: Date.now().toString(), name: nameInput.value, sounds: [] };
+            
             userProjects.push(newProj);
             localStorage.setItem('unstuntedsfx_projects', JSON.stringify(userProjects));
             document.getElementById('create-project-modal').classList.add('modal-hidden');
             nameInput.value = '';
+            
             if(currentSoundToAdd) addSoundToProject(newProj.id);
             renderProjects();
         });
@@ -1063,9 +1088,14 @@
         document.getElementById('mic-search-btn').addEventListener('click', async () => {
             if (!currentUser) return document.getElementById('auth-modal').classList.remove('modal-hidden');
 
-            const hasUnlimitedHum = ['pro', 'lifetime'].includes(userData.plan);
+            const plan = userData.plan || 'free';
+            const hasUnlimitedHum = ['pro', 'lifetime'].includes(plan);
             
-            if (!hasUnlimitedHum && userData.humSearchesThisMonth >= 1) {
+            // Set the max number of allowed hum searches based on tier
+            let maxHums = 1; // Free tier default
+            if (plan === 'creator') maxHums = 10;
+            
+            if (!hasUnlimitedHum && userData.humSearchesThisMonth >= maxHums) {
                 document.getElementById('pro-modal').classList.remove('modal-hidden');
                 return;
             }
@@ -1095,7 +1125,7 @@
                     cancelAnimationFrame(aid); stream.getTracks().forEach(t=>t.stop());
                     document.getElementById('hum-status').textContent = "Analyzing...";
                     
-                    // Deduct the usage from the database for free/creator users
+                    // Deduct the usage from the database for non-unlimited users
                     if (!hasUnlimitedHum) {
                         const currentMonth = new Date().toISOString().slice(0, 7);
                         userData.humSearchesThisMonth += 1;
