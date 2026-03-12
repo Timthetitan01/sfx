@@ -511,7 +511,7 @@
             measurementId: "G-PJTBJ12BM1"
         };
         
-        const STRIPE_LINK_CREATOR = "https://buy.stripe.com/test_YOUR_CREATOR_LINK_HERE"; 
+        const STRIPE_LINK_CREATOR = "https://buy.stripe.com/6oU28sdqw61KePd28108g0c"; 
         const STRIPE_LINK_PRO = "https://buy.stripe.com/test_YOUR_PRO_LINK_HERE"; 
         const STRIPE_LINK_LIFETIME = "https://buy.stripe.com/test_YOUR_LIFETIME_LINK_HERE"; 
 
@@ -524,7 +524,14 @@
         const provider = new GoogleAuthProvider();
 
         let currentUser = null;
-        let userData = { plan: 'free', downloadsToday: 0, lastDownloadDate: '', history: [] };
+        let userData = { 
+            plan: 'free', 
+            downloadsToday: 0, 
+            lastDownloadDate: '', 
+            history: [],
+            humSearchesThisMonth: 0,
+            lastHumSearchMonth: ''
+        };
         let userProjects = JSON.parse(localStorage.getItem('unstuntedsfx_projects')) || [];
         
         const soundsDB = [
@@ -565,7 +572,7 @@
                 updateUI();
             } else {
                 currentUser = null;
-                userData = { plan: 'free', downloadsToday: 0, lastDownloadDate: '', history: [] };
+                userData = { plan: 'free', downloadsToday: 0, lastDownloadDate: '', history: [], humSearchesThisMonth: 0, lastHumSearchMonth: '' };
                 document.querySelectorAll('.auth-btn').forEach(btn => btn.textContent = "Log In with Google");
                 updateUI();
             }
@@ -575,17 +582,45 @@
             const userRef = doc(db, "users", user.uid);
             const docSnap = await getDoc(userRef);
             const today = new Date().toISOString().split('T')[0];
+            const currentMonth = today.slice(0, 7); // 'YYYY-MM' format
 
             if (docSnap.exists()) {
                 userData = docSnap.data();
                 if (!userData.history) userData.history = [];
+                if (userData.humSearchesThisMonth === undefined) userData.humSearchesThisMonth = 0;
+                
+                let updates = {};
+                
+                // Daily downloads reset
                 if (userData.lastDownloadDate !== today) {
                     userData.downloadsToday = 0;
                     userData.lastDownloadDate = today;
-                    await updateDoc(userRef, { downloadsToday: 0, lastDownloadDate: today });
+                    updates.downloadsToday = 0;
+                    updates.lastDownloadDate = today;
+                }
+                
+                // Monthly hum search reset
+                if (userData.lastHumSearchMonth !== currentMonth) {
+                    userData.humSearchesThisMonth = 0;
+                    userData.lastHumSearchMonth = currentMonth;
+                    updates.humSearchesThisMonth = 0;
+                    updates.lastHumSearchMonth = currentMonth;
+                }
+                
+                if (Object.keys(updates).length > 0) {
+                    await updateDoc(userRef, updates);
                 }
             } else {
-                userData = { plan: 'free', downloadsToday: 0, lastDownloadDate: today, email: user.email, name: user.displayName, history: [] };
+                userData = { 
+                    plan: 'free', 
+                    downloadsToday: 0, 
+                    lastDownloadDate: today, 
+                    email: user.email, 
+                    name: user.displayName, 
+                    history: [],
+                    humSearchesThisMonth: 0,
+                    lastHumSearchMonth: currentMonth
+                };
                 await setDoc(userRef, userData);
             }
         }
@@ -919,8 +954,76 @@
         // SEARCH
         document.getElementById('search-input').addEventListener('input', (e) => { searchQuery = e.target.value; renderSounds(); });
 
-        // HUMMING MODAL 
-        window.stopHummingSearch = function() { document.getElementById('hum-modal').classList.add('modal-hidden'); };
+        // HUMMING MODAL WITH DB LIMIT
+        let actx, anl, aid, ht, pt;
+        const ctx = document.getElementById('audio-canvas').getContext('2d');
+        
+        document.getElementById('mic-search-btn').addEventListener('click', async () => {
+            if (!currentUser) {
+                alert("Please log in to use Hum Search.");
+                return;
+            }
+
+            const hasUnlimitedHum = ['pro', 'lifetime'].includes(userData.plan);
+            
+            if (!hasUnlimitedHum && userData.humSearchesThisMonth >= 1) {
+                document.getElementById('pro-modal').classList.remove('modal-hidden');
+                return;
+            }
+
+            document.getElementById('hum-modal').classList.remove('modal-hidden');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                document.getElementById('hum-status').textContent = "Listening...";
+                document.getElementById('hum-subtext').textContent = "Hum a tune...";
+                actx = new (window.AudioContext || window.webkitAudioContext)();
+                anl = actx.createAnalyser();
+                actx.createMediaStreamSource(stream).connect(anl);
+                const data = new Uint8Array(anl.frequencyBinCount);
+                
+                function draw() {
+                    aid = requestAnimationFrame(draw); anl.getByteFrequencyData(data);
+                    ctx.clearRect(0,0,300,100); ctx.fillStyle = '#0A84FF';
+                    for(let i=0, x=0; i<anl.frequencyBinCount; i++, x+=2.5) {
+                        ctx.beginPath();
+                        ctx.roundRect(x, (100-(data[i]/2))/2, 2, data[i]/2||2, [2]);
+                        ctx.fill();
+                    }
+                }
+                draw();
+                
+                ht = setTimeout(async () => {
+                    cancelAnimationFrame(aid); stream.getTracks().forEach(t=>t.stop());
+                    document.getElementById('hum-status').textContent = "Analyzing...";
+                    
+                    // Deduct the usage from the database for free/creator users
+                    if (!hasUnlimitedHum) {
+                        const currentMonth = new Date().toISOString().slice(0, 7);
+                        userData.humSearchesThisMonth += 1;
+                        userData.lastHumSearchMonth = currentMonth;
+                        const userRef = doc(db, "users", currentUser.uid);
+                        await updateDoc(userRef, {
+                            humSearchesThisMonth: userData.humSearchesThisMonth,
+                            lastHumSearchMonth: currentMonth
+                        });
+                    }
+
+                    pt = setTimeout(() => {
+                        window.stopHummingSearch();
+                        const si = document.getElementById('search-input');
+                        si.value = "Ambience"; si.dispatchEvent(new Event('input'));
+                    }, 1500);
+                }, 4000);
+            } catch(e) { 
+                document.getElementById('hum-status').textContent = "Mic Denied"; 
+                document.getElementById('hum-subtext').textContent = "Please allow mic permissions in your browser.";
+            }
+        });
+
+        window.stopHummingSearch = function() { 
+            document.getElementById('hum-modal').classList.add('modal-hidden');
+            if(aid) cancelAnimationFrame(aid); if(actx) actx.close(); clearTimeout(ht); clearTimeout(pt);
+        };
 
         // INITIALIZE
         renderFilters();
